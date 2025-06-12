@@ -1,0 +1,155 @@
+<!DOCTYPE html><html lang="fa">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>بازی دلاری</title>
+  <style>
+    body { font-family: sans-serif; direction: rtl; padding: 20px; }
+    #adminPanel, #dashboard, #loginSection, #licenseSection, #transferSection, #leaderboard, #createLicenseSection, #deleteUserSection {
+      display: none; margin-top: 20px;
+    }
+    .hidden { display: none; }
+    input { margin: 5px; padding: 5px; }
+    button { margin: 5px; padding: 5px 10px; }
+  </style>
+</head>
+<body>
+  <h1>بازی دلاری</h1>  <div id="registerSection">
+    <h3>ثبت‌نام / ورود</h3>
+    <input type="text" id="username" placeholder="نام کاربری">
+    <input type="password" id="password" placeholder="رمز عبور">
+    <button onclick="registerOrLogin()">ورود / ثبت‌نام</button>
+  </div>  <div id="dashboard">
+    <h3>داشبورد</h3>
+    <p>سلام، <span id="currentUser"></span>! موجودی: <span id="balance">0</span> $</p>
+    <button onclick="showSection('licenseSection')">وارد کردن کد لایسنس</button>
+    <button onclick="showSection('transferSection')">انتقال دلار</button>
+    <button onclick="showSection('leaderboard')">جدول برترها</button>
+    <button onclick="promptAdminLogin()">پنل مدیریت</button>
+  </div>  <div id="licenseSection">
+    <h3>کد لایسنس</h3>
+    <input type="text" id="licenseInput" placeholder="کد را وارد کنید">
+    <button onclick="redeemLicense()">ثبت</button>
+  </div>  <div id="transferSection">
+    <h3>انتقال دلار</h3>
+    <input type="text" id="transferTo" placeholder="نام کاربری گیرنده">
+    <input type="number" id="transferAmount" placeholder="مقدار دلار">
+    <button onclick="transferMoney()">انتقال</button>
+  </div>  <div id="leaderboard">
+    <h3>جدول برترها</h3>
+    <ul id="leaderboardList"></ul>
+  </div>  <div id="adminPanel">
+    <h3>پنل مدیریت</h3>
+    <div id="createLicenseSection">
+      <h4>ساخت کد لایسنس</h4>
+      <input type="text" id="newLicense" placeholder="کد">
+      <input type="number" id="licenseValue" placeholder="مقدار دلار">
+      <button onclick="createLicense()">ایجاد</button>
+    </div>
+    <div id="deleteUserSection">
+      <h4>حذف کاربر</h4>
+      <input type="text" id="deleteUsername" placeholder="نام کاربری">
+      <button onclick="deleteUser()">حذف</button>
+    </div>
+  </div>  <script>
+    let users = JSON.parse(localStorage.getItem('users') || '{}');
+    let licenses = JSON.parse(localStorage.getItem('licenses') || '{}');
+    let currentUser = null;
+
+    function saveData() {
+      localStorage.setItem('users', JSON.stringify(users));
+      localStorage.setItem('licenses', JSON.stringify(licenses));
+    }
+
+    function registerOrLogin() {
+      const name = document.getElementById('username').value;
+      const pass = document.getElementById('password').value;
+      if (!name || !pass) return alert("نام و رمز را وارد کنید.");
+
+      if (users[name]) {
+        if (users[name].password !== pass) return alert("رمز اشتباه است!");
+      } else {
+        users[name] = { password: pass, balance: 0 };
+        saveData();
+      }
+
+      currentUser = name;
+      document.getElementById('registerSection').style.display = 'none';
+      document.getElementById('dashboard').style.display = 'block';
+      updateDashboard();
+    }
+
+    function updateDashboard() {
+      document.getElementById('currentUser').innerText = currentUser;
+      document.getElementById('balance').innerText = users[currentUser].balance;
+    }
+
+    function showSection(id) {
+      ['licenseSection','transferSection','leaderboard','adminPanel'].forEach(x => document.getElementById(x).style.display = 'none');
+      document.getElementById(id).style.display = 'block';
+      if (id === 'leaderboard') updateLeaderboard();
+    }
+
+    function redeemLicense() {
+      const code = document.getElementById('licenseInput').value;
+      if (!licenses[code]) return alert("کد نامعتبر است!");
+      users[currentUser].balance += licenses[code];
+      delete licenses[code];
+      saveData();
+      updateDashboard();
+      alert("دلار اضافه شد!");
+    }
+
+    function transferMoney() {
+      const to = document.getElementById('transferTo').value;
+      const amount = parseInt(document.getElementById('transferAmount').value);
+      if (!users[to]) return alert("کاربر پیدا نشد");
+      if (amount <= 0 || users[currentUser].balance < amount) return alert("موجودی کافی نیست");
+      users[currentUser].balance -= amount;
+      users[to].balance += amount;
+      saveData();
+      updateDashboard();
+      alert("انتقال انجام شد");
+    }
+
+    function updateLeaderboard() {
+      const list = document.getElementById('leaderboardList');
+      list.innerHTML = '';
+      const sorted = Object.entries(users).sort((a,b) => b[1].balance - a[1].balance);
+      sorted.forEach(([name, data]) => {
+        const li = document.createElement('li');
+        li.innerText = `${name} — ${data.balance} $`;
+        list.appendChild(li);
+      });
+    }
+
+    function promptAdminLogin() {
+      const pwd = prompt("رمز ورود به مدیریت؟");
+      if (pwd === "Alireza.dr.N") {
+        showSection('adminPanel');
+      } else {
+        alert("رمز اشتباه است");
+      }
+    }
+
+    function createLicense() {
+      const code = document.getElementById('newLicense').value;
+      const val = parseInt(document.getElementById('licenseValue').value);
+      if (!code || val <= 0) return alert("اطلاعات صحیح نیست");
+      licenses[code] = val;
+      saveData();
+      alert("کد ساخته شد");
+    }
+
+    function deleteUser() {
+      const name = document.getElementById('deleteUsername').value;
+      if (users[name]) {
+        delete users[name];
+        saveData();
+        alert("کاربر حذف شد");
+      } else {
+        alert("کاربر یافت نشد");
+      }
+    }
+  </script></body>
+</html>
