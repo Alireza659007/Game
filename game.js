@@ -5,7 +5,7 @@ let hasCashedOut = false;
 let userBalance = loadBalance();
 let userName = "کاربر";
 
-const ctx = document.getElementById('crashChart').getContext('2d');
+const ctx = document.getElementById('crashChart')?.getContext('2d');
 let chart;
 let dataPoints = [];
 
@@ -17,7 +17,7 @@ function updateDisplay() {
 function startGame() {
   crashMultiplier = 1.00;
   updateDisplay();
-  let crashPoint = Math.random() * 10 + 1.5;
+  let crashPoint = Math.random() * 5 + 1.5;
   hasCashedOut = false;
   dataPoints = [];
 
@@ -65,7 +65,6 @@ function placeBet() {
   let amount = parseInt(document.getElementById("bet-amount").value);
   if (!amount || amount <= 0 || amount > userBalance) return alert("مبلغ نامعتبر است!");
 
-  crashMultiplier = 1.00;
   userBalance -= amount;
   saveBalance(userBalance);
   isBetting = true;
