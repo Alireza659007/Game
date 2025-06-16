@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>بازی انفجار</title>
   <link rel="stylesheet" href="style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
   <div id="app">
@@ -17,18 +18,17 @@
     <main>
       <div class="game-container">
         <div id="crash-display">x1.00</div>
+        <canvas id="crashChart" width="700" height="300"></canvas>
+        <input type="number" id="bet-amount" placeholder="مبلغ شرط" />
         <button id="bet-btn" onclick="placeBet()">شرط بستن</button>
         <button id="cashout-btn" onclick="cashOut()" disabled>برداشت</button>
-        <input type="number" id="bet-amount" placeholder="مبلغ شرط" />
       </div>
 
       <div class="history">
         <h3>📊 تاریخچه شرط‌ها</h3>
         <table>
           <thead>
-            <tr>
-              <th>نام</th><th>مبلغ</th><th>ضریب</th><th>نتیجه</th>
-            </tr>
+            <tr><th>نام</th><th>مبلغ</th><th>ضریب</th><th>نتیجه</th></tr>
           </thead>
           <tbody id="history-body"></tbody>
         </table>
@@ -41,7 +41,6 @@
       <button onclick="loginAdmin()">ورود</button>
 
       <div id="admin-controls" style="display:none;">
-        <h3>مدیریت کاربران</h3>
         <input id="target-user" placeholder="نام کاربر" />
         <input id="amount" type="number" placeholder="مبلغ" />
         <button onclick="chargeUser()">شارژ حساب</button>
@@ -51,7 +50,7 @@
   </div>
 
   <script src="data.js"></script>
-  <script src="game.js"></script>
   <script src="admin.js"></script>
+  <script src="game.js"></script>
 </body>
 </html>
