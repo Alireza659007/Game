@@ -1,240 +1,57 @@
 <!DOCTYPE html>
 <html lang="fa">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>بازی انفجار - شبیه 1efbet</title>
-<style>
-  @import url('https://fonts.googleapis.com/css2?family=Vazirmatn&display=swap');
-  body {
-    margin:0; padding:0;
-    font-family: 'Vazirmatn', sans-serif;
-    background: #0b1221;
-    color:#e1e8f7;
-    display:flex;
-    flex-direction: column;
-    align-items: center;
-    min-height: 100vh;
-  }
-  header {
-    background:#151d3b;
-    width: 100%;
-    padding: 1rem 0;
-    font-size: 1.8rem;
-    font-weight: 700;
-    text-align: center;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.7);
-  }
-  main {
-    flex-grow: 1;
-    max-width: 900px;
-    width: 100%;
-    padding: 1rem;
-  }
-  #chart-container {
-    background: #192c5c;
-    border-radius: 12px;
-    height: 280px;
-    margin-bottom: 1rem;
-    position: relative;
-    overflow: hidden;
-  }
-  #chart {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    height: 100%;
-    width: 100%;
-  }
-  #bet-section {
-    background: #152141;
-    border-radius: 10px;
-    padding: 1rem;
-    display: flex;
-    gap: 1rem;
-    flex-wrap: wrap;
-    align-items: center;
-  }
-  #bet-section input, #bet-section button {
-    font-size: 1.1rem;
-    border-radius: 8px;
-    border: none;
-    padding: 0.7rem 1rem;
-  }
-  #bet-section input {
-    flex-grow: 1;
-    max-width: 250px;
-  }
-  #bet-section button {
-    background: #08c; 
-    color: white;
-    cursor: pointer;
-    flex-grow: 0;
-    transition: background-color 0.3s ease;
-  }
-  #bet-section button:hover {
-    background: #006bb3;
-  }
-  #players-list, #history-table {
-    margin-top: 1rem;
-    background: #152141;
-    border-radius: 10px;
-    padding: 1rem;
-    max-height: 200px;
-    overflow-y: auto;
-  }
-  #players-list table, #history-table table {
-    width: 100%;
-    border-collapse: collapse;
-    color: #e1e8f7;
-  }
-  #players-list th, #players-list td, #history-table th, #history-table td {
-    border-bottom: 1px solid #223366;
-    padding: 0.4rem 0.7rem;
-    text-align: center;
-    font-size: 0.9rem;
-  }
-  #admin-panel {
-    background: #152141;
-    border-radius: 10px;
-    padding: 1rem;
-    margin-top: 1rem;
-  }
-  #admin-panel input {
-    padding: 0.6rem;
-    border-radius: 8px;
-    border: none;
-    margin-bottom: 0.8rem;
-    width: 100%;
-    font-size: 1rem;
-  }
-  #admin-panel button {
-    width: 100%;
-    padding: 0.7rem;
-    border-radius: 8px;
-    border: none;
-    background: #08c;
-    color: white;
-    font-size: 1.1rem;
-    cursor: pointer;
-  }
-  #admin-panel button:hover {
-    background: #006bb3;
-  }
-  #message {
-    margin-top: 1rem;
-    text-align: center;
-    font-weight: 700;
-    font-size: 1.1rem;
-  }
-  #withdraw-btn {
-    background: #0fbcf9;
-    border: none;
-    border-radius: 10px;
-    padding: 0.8rem 1.5rem;
-    font-size: 1.2rem;
-    color: white;
-    cursor: pointer;
-    margin-left: 1rem;
-    transition: background-color 0.3s ease;
-  }
-  #withdraw-btn:hover {
-    background: #0a9cd8;
-  }
-  #status-bar {
-    margin: 0.5rem 0;
-    font-weight: 700;
-    text-align: center;
-  }
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>بازی انفجار</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-<header>بازی انفجار شبیه 1efbet</header>
-<main>
-  <div id="chart-container">
-    <canvas id="chart"></canvas>
-    <div id="status-bar">منتظر شروع راند...</div>
+  <div id="app">
+    <header>
+      <h1>🎲 بازی انفجار</h1>
+      <div id="balance">موجودی: <span id="user-balance">10000</span> تومان</div>
+      <button onclick="showAdmin()">پنل ادمین</button>
+    </header>
+
+    <main>
+      <div class="game-container">
+        <div id="crash-display">x1.00</div>
+        <button id="bet-btn" onclick="placeBet()">شرط بستن</button>
+        <button id="cashout-btn" onclick="cashOut()" disabled>برداشت</button>
+        <input type="number" id="bet-amount" placeholder="مبلغ شرط" />
+      </div>
+
+      <div class="history">
+        <h3>📊 تاریخچه شرط‌ها</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>نام</th><th>مبلغ</th><th>ضریب</th><th>نتیجه</th>
+            </tr>
+          </thead>
+          <tbody id="history-body"></tbody>
+        </table>
+      </div>
+    </main>
+
+    <section id="admin-panel" style="display:none;">
+      <h2>🔐 پنل مدیریت</h2>
+      <input type="password" id="admin-password" placeholder="رمز" />
+      <button onclick="loginAdmin()">ورود</button>
+
+      <div id="admin-controls" style="display:none;">
+        <h3>مدیریت کاربران</h3>
+        <input id="target-user" placeholder="نام کاربر" />
+        <input id="amount" type="number" placeholder="مبلغ" />
+        <button onclick="chargeUser()">شارژ حساب</button>
+        <button onclick="deleteUser()">حذف کاربر</button>
+      </div>
+    </section>
   </div>
-  <section id="bet-section">
-    <input type="text" id="player-name" placeholder="نام بازیکن" />
-    <input type="number" id="bet-amount" placeholder="مقدار شرط (امتیاز)" min="1" />
-    <button id="place-bet-btn">ثبت شرط</button>
-    <button id="withdraw-btn" disabled>برداشت</button>
-  </section>
-  <section id="players-list">
-    <h3>بازیکنان و امتیازها</h3>
-    <table>
-      <thead>
-        <tr><th>نام</th><th>امتیاز</th><th>وضعیت</th></tr>
-      </thead>
-      <tbody id="players-tbody"></tbody>
-    </table>
-  </section>
-  <section id="history-table">
-    <h3>تاریخچه شرط‌ها</h3>
-    <table>
-      <thead>
-        <tr><th>نام</th><th>شرط</th><th>برد/باخت</th><th>ضریب برداشت</th></tr>
-      </thead>
-      <tbody id="history-tbody"></tbody>
-    </table>
-  </section>
-  <section id="admin-panel">
-    <h3>پنل ادمین</h3>
-    <input type="password" id="admin-pass" placeholder="رمز ورود (Alireza1313907)" />
-    <button id="admin-login-btn">ورود</button>
-    <div id="admin-controls" style="display:none;">
-      <input type="text" id="admin-user" placeholder="نام بازیکن" />
-      <input type="number" id="admin-charge-amount" placeholder="مقدار شارژ / حذف" />
-      <button id="admin-charge-btn">شارژ امتیاز</button>
-      <button id="admin-delete-btn">حذف بازیکن</button>
-    </div>
-  </section>
-  <div id="message"></div>
-</main>
-<script>
-(() => {
-  let gameState = 'waiting'; // waiting | running | ended
-  let players = JSON.parse(localStorage.getItem('players') || '{}');
-  let history = JSON.parse(localStorage.getItem('history') || '[]');
-  let crashPoint = 0;
-  let currentMultiplier = 1;
-  let animationFrameId = null;
-  let startTime = null;
-  let maxDuration = 15000;
-  let withdrawAllowed = false;
-  let withdrawingPlayers = new Set();
-  let adminLoggedIn = false;
 
-  const chartCanvas = document.getElementById('chart');
-  const ctx = chartCanvas.getContext('2d');
-  const statusBar = document.getElementById('status-bar');
-  const playersTbody = document.getElementById('players-tbody');
-  const historyTbody = document.getElementById('history-tbody');
-  const playerNameInput = document.getElementById('player-name');
-  const betAmountInput = document.getElementById('bet-amount');
-  const placeBetBtn = document.getElementById('place-bet-btn');
-  const withdrawBtn = document.getElementById('withdraw-btn');
-  const messageDiv = document.getElementById('message');
-  const adminPassInput = document.getElementById('admin-pass');
-  const adminLoginBtn = document.getElementById('admin-login-btn');
-  const adminControlsDiv = document.getElementById('admin-controls');
-  const adminUserInput = document.getElementById('admin-user');
-  const adminChargeAmountInput = document.getElementById('admin-charge-amount');
-  const adminChargeBtn = document.getElementById('admin-charge-btn');
-  const adminDeleteBtn = document.getElementById('admin-delete-btn');
-
-  function resizeCanvas() {
-    chartCanvas.width = chartCanvas.clientWidth;
-    chartCanvas.height = chartCanvas.clientHeight;
-  }
-  window.addEventListener('resize', resizeCanvas);
-  resizeCanvas();
-
-  function saveData() {
-    localStorage.setItem('players', JSON.stringify(players));
-    localStorage.setItem('history', JSON.stringify(history));
-  }
-
-  function drawChart(multiplier) {
-    ctx.clearRect
+  <script src="data.js"></script>
+  <script src="game.js"></script>
+  <script src="admin.js"></script>
+</body>
+</html>
