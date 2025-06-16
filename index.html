@@ -1,155 +1,240 @@
-<!DOCTYPE html><html lang="fa">
+<!DOCTYPE html>
+<html lang="fa">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>بازی دلاری</title>
-  <style>
-    body { font-family: sans-serif; direction: rtl; padding: 20px; }
-    #adminPanel, #dashboard, #loginSection, #licenseSection, #transferSection, #leaderboard, #createLicenseSection, #deleteUserSection {
-      display: none; margin-top: 20px;
-    }
-    .hidden { display: none; }
-    input { margin: 5px; padding: 5px; }
-    button { margin: 5px; padding: 5px 10px; }
-  </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>بازی انفجار - شبیه 1efbet</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Vazirmatn&display=swap');
+  body {
+    margin:0; padding:0;
+    font-family: 'Vazirmatn', sans-serif;
+    background: #0b1221;
+    color:#e1e8f7;
+    display:flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+  }
+  header {
+    background:#151d3b;
+    width: 100%;
+    padding: 1rem 0;
+    font-size: 1.8rem;
+    font-weight: 700;
+    text-align: center;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.7);
+  }
+  main {
+    flex-grow: 1;
+    max-width: 900px;
+    width: 100%;
+    padding: 1rem;
+  }
+  #chart-container {
+    background: #192c5c;
+    border-radius: 12px;
+    height: 280px;
+    margin-bottom: 1rem;
+    position: relative;
+    overflow: hidden;
+  }
+  #chart {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+  }
+  #bet-section {
+    background: #152141;
+    border-radius: 10px;
+    padding: 1rem;
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+  #bet-section input, #bet-section button {
+    font-size: 1.1rem;
+    border-radius: 8px;
+    border: none;
+    padding: 0.7rem 1rem;
+  }
+  #bet-section input {
+    flex-grow: 1;
+    max-width: 250px;
+  }
+  #bet-section button {
+    background: #08c; 
+    color: white;
+    cursor: pointer;
+    flex-grow: 0;
+    transition: background-color 0.3s ease;
+  }
+  #bet-section button:hover {
+    background: #006bb3;
+  }
+  #players-list, #history-table {
+    margin-top: 1rem;
+    background: #152141;
+    border-radius: 10px;
+    padding: 1rem;
+    max-height: 200px;
+    overflow-y: auto;
+  }
+  #players-list table, #history-table table {
+    width: 100%;
+    border-collapse: collapse;
+    color: #e1e8f7;
+  }
+  #players-list th, #players-list td, #history-table th, #history-table td {
+    border-bottom: 1px solid #223366;
+    padding: 0.4rem 0.7rem;
+    text-align: center;
+    font-size: 0.9rem;
+  }
+  #admin-panel {
+    background: #152141;
+    border-radius: 10px;
+    padding: 1rem;
+    margin-top: 1rem;
+  }
+  #admin-panel input {
+    padding: 0.6rem;
+    border-radius: 8px;
+    border: none;
+    margin-bottom: 0.8rem;
+    width: 100%;
+    font-size: 1rem;
+  }
+  #admin-panel button {
+    width: 100%;
+    padding: 0.7rem;
+    border-radius: 8px;
+    border: none;
+    background: #08c;
+    color: white;
+    font-size: 1.1rem;
+    cursor: pointer;
+  }
+  #admin-panel button:hover {
+    background: #006bb3;
+  }
+  #message {
+    margin-top: 1rem;
+    text-align: center;
+    font-weight: 700;
+    font-size: 1.1rem;
+  }
+  #withdraw-btn {
+    background: #0fbcf9;
+    border: none;
+    border-radius: 10px;
+    padding: 0.8rem 1.5rem;
+    font-size: 1.2rem;
+    color: white;
+    cursor: pointer;
+    margin-left: 1rem;
+    transition: background-color 0.3s ease;
+  }
+  #withdraw-btn:hover {
+    background: #0a9cd8;
+  }
+  #status-bar {
+    margin: 0.5rem 0;
+    font-weight: 700;
+    text-align: center;
+  }
+</style>
 </head>
 <body>
-  <h1>بازی دلاری</h1>  <div id="registerSection">
-    <h3>ثبت‌نام / ورود</h3>
-    <input type="text" id="username" placeholder="نام کاربری">
-    <input type="password" id="password" placeholder="رمز عبور">
-    <button onclick="registerOrLogin()">ورود / ثبت‌نام</button>
-  </div>  <div id="dashboard">
-    <h3>داشبورد</h3>
-    <p>سلام، <span id="currentUser"></span>! موجودی: <span id="balance">0</span> $</p>
-    <button onclick="showSection('licenseSection')">وارد کردن کد لایسنس</button>
-    <button onclick="showSection('transferSection')">انتقال دلار</button>
-    <button onclick="showSection('leaderboard')">جدول برترها</button>
-    <button onclick="promptAdminLogin()">پنل مدیریت</button>
-  </div>  <div id="licenseSection">
-    <h3>کد لایسنس</h3>
-    <input type="text" id="licenseInput" placeholder="کد را وارد کنید">
-    <button onclick="redeemLicense()">ثبت</button>
-  </div>  <div id="transferSection">
-    <h3>انتقال دلار</h3>
-    <input type="text" id="transferTo" placeholder="نام کاربری گیرنده">
-    <input type="number" id="transferAmount" placeholder="مقدار دلار">
-    <button onclick="transferMoney()">انتقال</button>
-  </div>  <div id="leaderboard">
-    <h3>جدول برترها</h3>
-    <ul id="leaderboardList"></ul>
-  </div>  <div id="adminPanel">
-    <h3>پنل مدیریت</h3>
-    <div id="createLicenseSection">
-      <h4>ساخت کد لایسنس</h4>
-      <input type="text" id="newLicense" placeholder="کد">
-      <input type="number" id="licenseValue" placeholder="مقدار دلار">
-      <button onclick="createLicense()">ایجاد</button>
+<header>بازی انفجار شبیه 1efbet</header>
+<main>
+  <div id="chart-container">
+    <canvas id="chart"></canvas>
+    <div id="status-bar">منتظر شروع راند...</div>
+  </div>
+  <section id="bet-section">
+    <input type="text" id="player-name" placeholder="نام بازیکن" />
+    <input type="number" id="bet-amount" placeholder="مقدار شرط (امتیاز)" min="1" />
+    <button id="place-bet-btn">ثبت شرط</button>
+    <button id="withdraw-btn" disabled>برداشت</button>
+  </section>
+  <section id="players-list">
+    <h3>بازیکنان و امتیازها</h3>
+    <table>
+      <thead>
+        <tr><th>نام</th><th>امتیاز</th><th>وضعیت</th></tr>
+      </thead>
+      <tbody id="players-tbody"></tbody>
+    </table>
+  </section>
+  <section id="history-table">
+    <h3>تاریخچه شرط‌ها</h3>
+    <table>
+      <thead>
+        <tr><th>نام</th><th>شرط</th><th>برد/باخت</th><th>ضریب برداشت</th></tr>
+      </thead>
+      <tbody id="history-tbody"></tbody>
+    </table>
+  </section>
+  <section id="admin-panel">
+    <h3>پنل ادمین</h3>
+    <input type="password" id="admin-pass" placeholder="رمز ورود (Alireza1313907)" />
+    <button id="admin-login-btn">ورود</button>
+    <div id="admin-controls" style="display:none;">
+      <input type="text" id="admin-user" placeholder="نام بازیکن" />
+      <input type="number" id="admin-charge-amount" placeholder="مقدار شارژ / حذف" />
+      <button id="admin-charge-btn">شارژ امتیاز</button>
+      <button id="admin-delete-btn">حذف بازیکن</button>
     </div>
-    <div id="deleteUserSection">
-      <h4>حذف کاربر</h4>
-      <input type="text" id="deleteUsername" placeholder="نام کاربری">
-      <button onclick="deleteUser()">حذف</button>
-    </div>
-  </div>  <script>
-    let users = JSON.parse(localStorage.getItem('users') || '{}');
-    let licenses = JSON.parse(localStorage.getItem('licenses') || '{}');
-    let currentUser = null;
+  </section>
+  <div id="message"></div>
+</main>
+<script>
+(() => {
+  let gameState = 'waiting'; // waiting | running | ended
+  let players = JSON.parse(localStorage.getItem('players') || '{}');
+  let history = JSON.parse(localStorage.getItem('history') || '[]');
+  let crashPoint = 0;
+  let currentMultiplier = 1;
+  let animationFrameId = null;
+  let startTime = null;
+  let maxDuration = 15000;
+  let withdrawAllowed = false;
+  let withdrawingPlayers = new Set();
+  let adminLoggedIn = false;
 
-    function saveData() {
-      localStorage.setItem('users', JSON.stringify(users));
-      localStorage.setItem('licenses', JSON.stringify(licenses));
-    }
+  const chartCanvas = document.getElementById('chart');
+  const ctx = chartCanvas.getContext('2d');
+  const statusBar = document.getElementById('status-bar');
+  const playersTbody = document.getElementById('players-tbody');
+  const historyTbody = document.getElementById('history-tbody');
+  const playerNameInput = document.getElementById('player-name');
+  const betAmountInput = document.getElementById('bet-amount');
+  const placeBetBtn = document.getElementById('place-bet-btn');
+  const withdrawBtn = document.getElementById('withdraw-btn');
+  const messageDiv = document.getElementById('message');
+  const adminPassInput = document.getElementById('admin-pass');
+  const adminLoginBtn = document.getElementById('admin-login-btn');
+  const adminControlsDiv = document.getElementById('admin-controls');
+  const adminUserInput = document.getElementById('admin-user');
+  const adminChargeAmountInput = document.getElementById('admin-charge-amount');
+  const adminChargeBtn = document.getElementById('admin-charge-btn');
+  const adminDeleteBtn = document.getElementById('admin-delete-btn');
 
-    function registerOrLogin() {
-      const name = document.getElementById('username').value;
-      const pass = document.getElementById('password').value;
-      if (!name || !pass) return alert("نام و رمز را وارد کنید.");
+  function resizeCanvas() {
+    chartCanvas.width = chartCanvas.clientWidth;
+    chartCanvas.height = chartCanvas.clientHeight;
+  }
+  window.addEventListener('resize', resizeCanvas);
+  resizeCanvas();
 
-      if (users[name]) {
-        if (users[name].password !== pass) return alert("رمز اشتباه است!");
-      } else {
-        users[name] = { password: pass, balance: 0 };
-        saveData();
-      }
+  function saveData() {
+    localStorage.setItem('players', JSON.stringify(players));
+    localStorage.setItem('history', JSON.stringify(history));
+  }
 
-      currentUser = name;
-      document.getElementById('registerSection').style.display = 'none';
-      document.getElementById('dashboard').style.display = 'block';
-      updateDashboard();
-    }
-
-    function updateDashboard() {
-      document.getElementById('currentUser').innerText = currentUser;
-      document.getElementById('balance').innerText = users[currentUser].balance;
-    }
-
-    function showSection(id) {
-      ['licenseSection','transferSection','leaderboard','adminPanel'].forEach(x => document.getElementById(x).style.display = 'none');
-      document.getElementById(id).style.display = 'block';
-      if (id === 'leaderboard') updateLeaderboard();
-    }
-
-    function redeemLicense() {
-      const code = document.getElementById('licenseInput').value;
-      if (!licenses[code]) return alert("کد نامعتبر است!");
-      users[currentUser].balance += licenses[code];
-      delete licenses[code];
-      saveData();
-      updateDashboard();
-      alert("دلار اضافه شد!");
-    }
-
-    function transferMoney() {
-      const to = document.getElementById('transferTo').value;
-      const amount = parseInt(document.getElementById('transferAmount').value);
-      if (!users[to]) return alert("کاربر پیدا نشد");
-      if (amount <= 0 || users[currentUser].balance < amount) return alert("موجودی کافی نیست");
-      users[currentUser].balance -= amount;
-      users[to].balance += amount;
-      saveData();
-      updateDashboard();
-      alert("انتقال انجام شد");
-    }
-
-    function updateLeaderboard() {
-      const list = document.getElementById('leaderboardList');
-      list.innerHTML = '';
-      const sorted = Object.entries(users).sort((a,b) => b[1].balance - a[1].balance);
-      sorted.forEach(([name, data]) => {
-        const li = document.createElement('li');
-        li.innerText = `${name} — ${data.balance} $`;
-        list.appendChild(li);
-      });
-    }
-
-    function promptAdminLogin() {
-      const pwd = prompt("رمز ورود به مدیریت؟");
-      if (pwd === "Alireza.dr.N") {
-        showSection('adminPanel');
-      } else {
-        alert("رمز اشتباه است");
-      }
-    }
-
-    function createLicense() {
-      const code = document.getElementById('newLicense').value;
-      const val = parseInt(document.getElementById('licenseValue').value);
-      if (!code || val <= 0) return alert("اطلاعات صحیح نیست");
-      licenses[code] = val;
-      saveData();
-      alert("کد ساخته شد");
-    }
-
-    function deleteUser() {
-      const name = document.getElementById('deleteUsername').value;
-      if (users[name]) {
-        delete users[name];
-        saveData();
-        alert("کاربر حذف شد");
-      } else {
-        alert("کاربر یافت نشد");
-      }
-    }
-  </script></body>
-</html>
+  function drawChart(multiplier) {
+    ctx.clearRect
