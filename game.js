@@ -5,6 +5,10 @@ let hasCashedOut = false;
 let userBalance = loadBalance();
 let userName = "کاربر";
 
+const ctx = document.getElementById('crashChart').getContext('2d');
+let chart;
+let dataPoints = [];
+
 function updateDisplay() {
   document.getElementById("crash-display").textContent = `x${crashMultiplier.toFixed(2)}`;
   document.getElementById("user-balance").textContent = userBalance;
@@ -15,10 +19,39 @@ function startGame() {
   updateDisplay();
   let crashPoint = Math.random() * 10 + 1.5;
   hasCashedOut = false;
+  dataPoints = [];
+
+  if (chart) chart.destroy();
+
+  chart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: [],
+      datasets: [{
+        label: 'ضریب',
+        data: [],
+        borderColor: 'gold',
+        borderWidth: 2,
+        fill: false,
+        tension: 0.2
+      }]
+    },
+    options: {
+      animation: false,
+      scales: {
+        x: { display: false },
+        y: { beginAtZero: true }
+      }
+    }
+  });
 
   gameInterval = setInterval(() => {
     crashMultiplier += 0.05 + crashMultiplier / 30;
     updateDisplay();
+
+    chart.data.labels.push('');
+    chart.data.datasets[0].data.push(crashMultiplier.toFixed(2));
+    chart.update();
 
     if (crashMultiplier >= crashPoint) {
       endGame(false);
@@ -32,9 +65,11 @@ function placeBet() {
   let amount = parseInt(document.getElementById("bet-amount").value);
   if (!amount || amount <= 0 || amount > userBalance) return alert("مبلغ نامعتبر است!");
 
+  crashMultiplier = 1.00;
   userBalance -= amount;
   saveBalance(userBalance);
   isBetting = true;
+  hasCashedOut = false;
   document.getElementById("bet-btn").disabled = true;
   document.getElementById("cashout-btn").disabled = false;
 
