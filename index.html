@@ -20,7 +20,7 @@
         <div id="crash-display">x1.00</div>
         <canvas id="crashChart" width="700" height="300"></canvas>
         <input type="number" id="bet-amount" placeholder="مبلغ شرط" />
-        <button id="bet-btn" onclick="placeBet()">شرط بستن</button>
+        <button id="bet-btn" onclick="placeBet()">شروع شرط</button>
         <button id="cashout-btn" onclick="cashOut()" disabled>برداشت</button>
       </div>
 
@@ -41,9 +41,8 @@
       <button onclick="loginAdmin()">ورود</button>
 
       <div id="admin-controls" style="display:none;">
-        <input id="target-user" placeholder="نام کاربر" />
-        <input id="amount" type="number" placeholder="مبلغ" />
-        <button onclick="chargeUser()">شارژ حساب</button>
+        <input id="amount" type="number" placeholder="مقدار" />
+        <button onclick="chargeUser()">شارژ کاربر</button>
         <button onclick="deleteUser()">حذف کاربر</button>
       </div>
     </section>
